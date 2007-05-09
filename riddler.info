@@ -1,0 +1,6 @@
+; $Id
+name = Riddler
+description = Allows site administrators to add a simple question to form validation
+;package = Core - optional
+version = VERSION
+
