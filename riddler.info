@@ -1,5 +1,6 @@
 ; $Id
-name = Riddler
+name = Captcha Riddler
 description = Allows site administrators to add a simple question to form validation
-;package = Core - optional
-
+package = Spam control
+dependencies[] = captcha
+core = 6.x
