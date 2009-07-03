@@ -84,7 +84,7 @@ function riddler_settings() {
     '#type' => 'textfield',
     '#title' => t('Answer'),
     '#default_value' => variable_get('riddler_answer_0', 'yes'),
-    '#description' => t('Answer to the above question. You may allow more than one correct answer by entering a comma or space-separated list. Answers are not case sensitive'),
+    '#description' => t('Answer to the above question. You may allow more than one correct answer by entering a comma or space-separated list. Answers are not case sensitive. Answers must be only one word.'),
     '#required' => FALSE,
   );
   $number = variable_get('riddler_number', 1);
@@ -107,7 +107,7 @@ function riddler_settings() {
       '#type' => 'textfield',
       '#title' => t('Answer'),
       '#default_value' => variable_get('riddler_answer_'. $i, ''),
-    '#description' => t('Answer to the above question. You may allow more than one correct answer by entering a comma or space-separated list. Answers are not case sensitive'),
+    '#description' => t('Answer to the above question. You may allow more than one correct answer by entering a comma or space-separated list. Answers are not case sensitive.  Answers must be only one word.'),
       '#required' => FALSE,
     );
   }
@@ -180,5 +180,5 @@ function riddler_captcha($op, $captcha_type='') {
 function riddler_captcha_validate($solution, $response) {
   $solution = str_ireplace(',', '', $solution);
   $solution = explode(' ', $solution);
-  return in_array($response, $solution);
+  return in_array(drupal_strtolower($response), $solution);
 }
