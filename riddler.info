@@ -1,4 +1,3 @@
-; $Id$
 name = Captcha Riddler
 description = Allows site administrators to add a simple question to form validation
 package = Spam control
