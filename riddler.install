@@ -10,8 +10,9 @@
  */
 function riddler_install() {
   // Set default riddle.
-  variable_set('riddler_question_1', 'Do you like SPAM (yes or no) ?');
-  variable_set('riddler_answer_1', 'yes,no');
+  $insert = db_insert('riddler_questions')->fields(array('question', 'answer'));
+  $data = array('question' => 'Do you like SPAM?', 'answer' => 'No');
+  $insert->values($data)->execute();
 }
 
 /**
@@ -48,6 +49,5 @@ function riddler_schema() {
     ),
     'primary key' => array('qid'),
   );
-
   return $schema;
 }

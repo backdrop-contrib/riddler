@@ -80,7 +80,7 @@ function riddler_settings($form, &$form_state) {
   if (isset($form_state['triggering_element']) && $form_state['triggering_element']['#name'] == 'add-riddle') {
     // Make sure there are enough unsaved riddle fieldsets.
     for ($x = 0; $x <= $form_state['values']['riddles'] - $saved_riddles; $x++) {
-      $riddles[] = array('question' =>'','answer' => '');
+      $riddles[] = array('question' => '', 'answer' => '');
     }
   }
   foreach ($riddles as $key => $riddle) {
@@ -90,41 +90,41 @@ function riddler_settings($form, &$form_state) {
     // Is ajax rebuilding the form?
     if (isset($form_state['values'])) {
       // Is this question deleted?
-      if ($form_state['values']['riddler_delete_'. $i]) {
+      if ($form_state['values']['riddler_delete_' . $i]) {
         $access = FALSE;
       }
     }
-    $collapse = isset($form_state['values']) ? (isset($form_state['values']['riddler_question_'. $i]) && !empty($form_state['values']['riddler_question_'. $i])) : TRUE;
-    $title = isset($form_state['values']) ? (!empty($form_state['values']['riddler_question_'. $i]) ? t('Riddle') .' '. $i . ': '. $form_state['values']['riddler_question_'. $i] : t('Riddle !i', array('!i' => $i))) : t('Riddle') .' '. $i . ': '. $riddle['question'];
-    $form['riddler_groups']['riddler_group_'. $i] = array(
+    $collapse = isset($form_state['values']) ? (isset($form_state['values']['riddler_question_' . $i]) && !empty($form_state['values']['riddler_question_' . $i])) : TRUE;
+    $title = isset($form_state['values']) ? (!empty($form_state['values']['riddler_question_' . $i]) ? t('Riddle') . ' ' . $i . ': ' . $form_state['values']['riddler_question_' . $i] : t('Riddle !i', array('!i' => $i))) : t('Riddle') . ' ' . $i . ': ' . $riddle['question'];
+    $form['riddler_groups']['riddler_group_' . $i] = array(
       '#type' => 'fieldset',
       '#title' => $title,
       '#collapsible' => TRUE,
       '#collapsed' => $collapse,
       '#access' => $access,
     );
-    $form['riddler_groups']['riddler_group_'. $i]['riddler_question_'. $i] = array(
+    $form['riddler_groups']['riddler_group_' . $i]['riddler_question_' . $i] = array(
       '#type' => 'textfield',
       '#title' => t('Question'),
       '#description' => t('A question that you require anonymous users to answer'),
-      '#default_value' => isset($form_state['values']['riddler_question_'. $i]) ? $form_state['values']['riddler_question_'. $i] : $riddle['question'],
+      '#default_value' => isset($form_state['values']['riddler_question_' . $i]) ? $form_state['values']['riddler_question_' . $i] : $riddle['question'],
       '#required' => FALSE,
       '#access' => $access,
     );
-    $form['riddler_groups']['riddler_group_'. $i]['riddler_answer_'. $i] = array(
+    $form['riddler_groups']['riddler_group_' . $i]['riddler_answer_' . $i] = array(
       '#type' => 'textfield',
       '#title' => t('Answer'),
-      '#default_value' => isset($form_state['values']['riddler_answer_'. $i]) ? $form_state['values']['riddler_answer_'. $i] : $riddle['answer'],
+      '#default_value' => isset($form_state['values']['riddler_answer_' . $i]) ? $form_state['values']['riddler_answer_' . $i] : $riddle['answer'],
       '#description' => t('Answer to the above question. You may allow more than one correct answer by entering a comma or space-separated list. Answers are not case sensitive.  Answers must be only one word.'),
       '#access' => $access,
       '#required' => FALSE,
     );
-    $form['riddler_groups']['riddler_group_'. $i]['riddler_delete_'. $i] = array(
+    $form['riddler_groups']['riddler_group_' . $i]['riddler_delete_' . $i] = array(
       '#type' => 'checkbox',
       '#title' => t('Delete'),
       '#description' => t('Permanently delete this riddle/answer pair?'),
       '#required' => FALSE,
-      '#default_value' => isset($form_state['values']['riddler_delete_'. $i]) ? $form_state['values']['riddler_delete_'. $i] : 0,
+      '#default_value' => isset($form_state['values']['riddler_delete_' . $i]) ? $form_state['values']['riddler_delete_' . $i] : 0,
       '#ajax' => array(
         'callback' => 'riddler_ajax_add_riddle',
         'wrapper' => 'riddler-groups',
@@ -172,16 +172,16 @@ function riddler_ajax_add_riddle($form, $form_state) {
  */
 function riddler_settings_validate($form, &$form_state) {
   $i = 1;
-  while (array_key_exists('riddler_question_'. $i, $form_state['values'])) {
-    if ($form_state['values']['riddler_question_'. $i] != '' && $form_state['values']['riddler_answer_'. $i] == '') {
-      form_set_error('riddler_answer_'. $i, t('Riddle !i is incomplete (answer is missing).', array('!i' => $i)));
+  while (array_key_exists('riddler_question_' . $i, $form_state['values'])) {
+    if ($form_state['values']['riddler_question_' . $i] != '' && $form_state['values']['riddler_answer_' . $i] == '') {
+      form_set_error('riddler_answer_' . $i, t('Riddle !i is incomplete (answer is missing).', array('!i' => $i)));
     }
-    if ($form_state['values']['riddler_question_'. $i] == '' && $form_state['values']['riddler_answer_'. $i] != '') {
-      form_set_error('riddler_question_'. $i, t('Riddle !i is incomplete (question is missing).', array('!i' => $i)));
+    if ($form_state['values']['riddler_question_' . $i] == '' && $form_state['values']['riddler_answer_' . $i] != '') {
+      form_set_error('riddler_question_' . $i, t('Riddle !i is incomplete (question is missing).', array('!i' => $i)));
     }
     // Unset any completely empty riddle/answer pairs.
-    if ($form_state['values']['riddler_question_'. $i] == '' && $form_state['values']['riddler_answer_'. $i] == '') {
-      unset($form_state['values']['riddler_question_'. $i], $form_state['values']['riddler_answer_'. $i]);
+    if ($form_state['values']['riddler_question_' . $i] == '' && $form_state['values']['riddler_answer_' . $i] == '') {
+      unset($form_state['values']['riddler_question_' . $i], $form_state['values']['riddler_answer_' . $i]);
     }
     $i++;
   }
@@ -202,10 +202,10 @@ function riddler_settings_submit($form, &$form_state) {
     if (stristr($group, 'riddler_group')) {
       $qid = str_replace('riddler_group_', '', $group);
       // Make sure pair is not deleted or empty.
-      if (!$values['riddler_delete_'. $qid] && isset($values['riddler_question_'. $qid])) {
+      if (!$values['riddler_delete_' . $qid] && isset($values['riddler_question_' . $qid])) {
         $data[] = array(
-          'question' => $values['riddler_question_'. $qid],
-          'answer' => $values['riddler_answer_'. $qid],
+          'question' => $values['riddler_question_' . $qid],
+          'answer' => $values['riddler_answer_' . $qid],
         );
       }
     }
@@ -215,7 +215,6 @@ function riddler_settings_submit($form, &$form_state) {
   }
   $insert->execute();
   variable_set('riddler_weight', $form_state['values']['riddler_weight']);
-  variable_set('riddler_number', count($data));
   drupal_set_message(t('Riddler settings saved.'), 'status');
 }
 
@@ -232,19 +231,18 @@ function riddler_captcha($op, $captcha_type='') {
       $result = array();
       $riddles = riddler_get_riddles();
       $key = array_rand($riddles);
-        $i = rand(1, variable_get('riddler_number', 1)) - 1;
-        $result['form']['captcha_response'] = array(
-          '#type' => 'textfield',
-          '#title' => $riddles[$key]['question'],
-          '#description' => t('Fill in the blank.'),
-          '#size' => 50,
-          '#maxlength' => 50,
-          '#required' => TRUE,
-          '#weight' => variable_get('riddler_weight', 0),
-        );
-        $result['solution'] = (string)(drupal_strtolower($riddles[$key]['answer']));
-        $result['captcha_validate'] = 'riddler_captcha_validate';
-        return $result;
+      $result['form']['captcha_response'] = array(
+        '#type' => 'textfield',
+        '#title' => $riddles[$key]['question'],
+        '#description' => t('Fill in the blank.'),
+        '#size' => 50,
+        '#maxlength' => 50,
+        '#required' => TRUE,
+        '#weight' => variable_get('riddler_weight', 0),
+      );
+      $result['solution'] = (string)(drupal_strtolower($riddles[$key]['answer']));
+      $result['captcha_validate'] = 'riddler_captcha_validate';
+      return $result;
       }
     break;
   }
