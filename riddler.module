@@ -90,7 +90,7 @@ function riddler_settings($form, &$form_state) {
     // Is ajax rebuilding the form?
     if (isset($form_state['values'])) {
       // Is this question deleted?
-      if ($form_state['values']['riddler_delete_' . $i]) {
+      if (isset($form_state['values']['riddler_delete_' . $i]) && $form_state['values']['riddler_delete_' . $i]) {
         $access = FALSE;
       }
     }
