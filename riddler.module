@@ -107,14 +107,14 @@ function riddler_settings($form, &$form_state) {
       '#type' => 'textfield',
       '#title' => t('Question'),
       '#description' => t('A question that you require anonymous users to answer'),
-      '#default_value' => isset($form_state['values']['riddler_question_' . $i]) ? $form_state['values']['riddler_question_' . $i] : $riddle['question'],
+      '#default_value' => check_plain(isset($form_state['values']['riddler_question_' . $i]) ? $form_state['values']['riddler_question_' . $i] : $riddle['question']),
       '#required' => FALSE,
       '#access' => $access,
     );
     $form['riddler_groups']['riddler_group_' . $i]['riddler_answer_' . $i] = array(
       '#type' => 'textfield',
       '#title' => t('Answer'),
-      '#default_value' => isset($form_state['values']['riddler_answer_' . $i]) ? $form_state['values']['riddler_answer_' . $i] : $riddle['answer'],
+      '#default_value' => check_plain(isset($form_state['values']['riddler_answer_' . $i]) ? $form_state['values']['riddler_answer_' . $i] : $riddle['answer']),
       '#description' => t('Answer to the above question. You may allow more than one correct answer by entering a comma or space-separated list. Answers are not case sensitive.  Answers must be only one word.'),
       '#access' => $access,
       '#required' => FALSE,
