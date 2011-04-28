@@ -1,5 +1,6 @@
 name = Captcha Riddler
 description = Allows site administrators to add a simple question to form validation
+core = 7.x
 package = Spam control
 dependencies[] = captcha
-core = 6.x
+configure = admin/user/captcha/riddler
