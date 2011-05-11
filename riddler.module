@@ -259,7 +259,7 @@ function riddler_captcha($op, $captcha_type='') {
  *   TRUE if the response is found in the solution, or FALSE.
  */
 function riddler_captcha_validate($solution, $response) {
-  $solution = str_ireplace(',', '', $solution);
+  $solution = str_ireplace(',', ' ', $solution);
   $solution = explode(' ', $solution);
   return in_array(drupal_strtolower($response), $solution);
 }
