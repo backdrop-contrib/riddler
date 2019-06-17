@@ -207,6 +207,9 @@ function riddler_settings_submit($form, &$form_state) {
           'question' => $values['riddler_question_' . $qid],
           'answer' => $values['riddler_answer_' . $qid],
         );
+        // Force call to t() to insert new riddles in the translation database
+        $translation_hack = t(filter_xss($values['riddler_question_' . $qid]));
+        $translation_hack = t(filter_xss($values['riddler_answer_' . $qid]));
       }
     }
   }
@@ -233,14 +236,14 @@ function riddler_captcha($op, $captcha_type='') {
       $key = array_rand($riddles);
       $result['form']['captcha_response'] = array(
         '#type' => 'textfield',
-        '#title' => $riddles[$key]['question'],
+        '#title' => t(filter_xss($riddles[$key]['question'])),
         '#description' => t('Fill in the blank.'),
         '#size' => 50,
         '#maxlength' => 50,
         '#required' => TRUE,
         '#weight' => variable_get('riddler_weight', 0),
       );
-      $result['solution'] = (string)(drupal_strtolower($riddles[$key]['answer']));
+      $result['solution'] = t(filter_xss((string)(drupal_strtolower($riddles[$key]['answer']))));
       $result['captcha_validate'] = 'riddler_captcha_validate';
       return $result;
       }
