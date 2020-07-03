@@ -11,23 +11,24 @@ requiring guests to answer the 'riddle' before being allowed to submit the form.
 
 ## Examples
 
-Depending on your situations, you might ask different questions to get the
+Depending on your situation, you might ask different questions to get the
 most out of Captcha Riddler without frustating your site visitors.
 
-If people who register or fill out any forms should know things anyway, ask
+If people who register or fill out any forms should know certain things anyway, ask
 these commonly known things, e.g.:
 
-*Q*: What's the name of our club mascot?
+**Q:** What's the name of our club mascot?
 
 If your site has a language with accents or umlauts, make sure that answers
 contain these, e.g.:
 
-*Q*: Bekannte deutsche Stadt mit Dom - K...
-*A*: Köln
+**Q:** Bekannte deutsche Stadt mit Dom - K...
+
+**A:** Köln
 
 Or create simple groups of words where one doesn't belong, e.g.:
 
-*Q*: Which word does not belong: cat, dog, cow, bicycle
+**Q:** Which word does not belong: cat, dog, cow, bicycle
 
 Make sure you create a bunch of questions - the more the better.
 
