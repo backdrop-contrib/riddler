@@ -1,0 +1,10 @@
+{
+    "_config_name": "riddler.settings",
+    "riddler_weight": "0",
+    "riddler_questions": [
+        {
+            "question": "Do you like SPAM?",
+            "answer": "No!"
+        }
+    ]
+}

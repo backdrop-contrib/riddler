@@ -10,15 +10,14 @@
  */
 
 /**
- * Implementation of hook_help().
+ * Implements hook_config_info().
  */
-
-function riddler_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#riddler':
-      return t('Requires anonymous users to answer a simple question to be answered forms are processed. A primitive but effective way to counter spam.');
-      break;
-  }
+function riddler_config_info() {
+  $prefixes['riddler.settings'] = array(
+    'label' => t('Captcha Riddler Settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
 }
 
 /**
@@ -43,7 +42,7 @@ function riddler_menu() {
   $items['admin/config/people/captcha/riddler'] = array(
     'title' => 'Riddler',
     'description' => 'Allows you to force a question to a number of forms to counter f.e. spammers.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('riddler_settings'),
     'access arguments' => array('administer riddler'),
     'type' => MENU_LOCAL_TASK,
@@ -61,10 +60,11 @@ function riddler_settings($form, &$form_state) {
   $saved_riddles = count($riddles);
   $form = array();
   $form['riddler_weight'] = array(
-    '#type' => 'select',
+    '#type' => 'number',// FIXME number field.
     '#title' => t('Weight'),
-    '#default_value' => variable_get('riddler_weight', 0),
-    '#options' => drupal_map_assoc(range(-10, 10)),
+    '#default_value' => config_get('riddler.settings', 'riddler_weight'),
+    '#min' => -20,
+    '#max' => 20,
     '#description' => t('Weight of the Riddler form element'),
     '#required' => TRUE,
   );
@@ -187,34 +187,29 @@ function riddler_settings_validate($form, &$form_state) {
  * Submit the settings form.
  */
 function riddler_settings_submit($form, &$form_state) {
-  // Delete them all.
-  db_delete('riddler_questions')->execute();
-
-  $insert = db_insert('riddler_questions')
-    ->fields(array('question', 'answer'));
-  $data = array();
+  $riddler_questions = array();
   $values = $form_state['values'];
   foreach (element_children($form['riddler_groups']) as $group) {
     if (stristr($group, 'riddler_group')) {
       $qid = str_replace('riddler_group_', '', $group);
       // Make sure pair is not deleted or empty.
       if (!$values['riddler_delete_' . $qid] && isset($values['riddler_question_' . $qid])) {
-        $data[] = array(
+        $riddler_questions[] = array(
           'question' => $values['riddler_question_' . $qid],
           'answer' => $values['riddler_answer_' . $qid],
         );
         // Force call to t() to insert new riddles in the translation database!
-        $translation_hack = t(filter_xss($values['riddler_question_' . $qid]));
-        $translation_hack = t(filter_xss($values['riddler_answer_' . $qid]));
+        // FIXME translatable.
+        //$translation_hack = t(filter_xss($values['riddler_question_' . $qid]));
+        //$translation_hack = t(filter_xss($values['riddler_answer_' . $qid]));
       }
     }
   }
-  foreach ($data as $datum) {
-    $insert->values($datum);
-  }
-  $insert->execute();
-  variable_set('riddler_weight', $form_state['values']['riddler_weight']);
-  drupal_set_message(t('Riddler settings saved.'), 'status');
+  $config = config('riddler.settings');
+  $config->set('riddler_weight', $form_state['values']['riddler_weight']);
+  $config->set('riddler_questions', $riddler_questions);
+  $config->save();
+  backdrop_set_message(t('Riddler settings saved.'), 'status');
 }
 
 /**
@@ -237,9 +232,9 @@ function riddler_captcha($op, $captcha_type = '') {
           '#size' => 50,
           '#maxlength' => 50,
           '#required' => TRUE,
-          '#weight' => variable_get('riddler_weight', 0),
+          '#weight' => config_get('riddler.settings', 'riddler_weight'),
         );
-        $result['solution'] = t(filter_xss((string) (drupal_strtolower($riddles[$key]['answer']))));
+        $result['solution'] = t(filter_xss((string) (backdrop_strtolower($riddles[$key]['answer']))));
         $result['captcha_validate'] = 'riddler_captcha_validate';
         return $result;
       }
@@ -261,18 +256,13 @@ function riddler_captcha($op, $captcha_type = '') {
 function riddler_captcha_validate($solution, $response) {
   $solution = str_ireplace(',', ' ', $solution);
   $solution = explode(' ', $solution);
-  return in_array(drupal_strtolower($response), $solution);
+  return in_array(backdrop_strtolower($response), $solution);
 }
 
 /**
  * Load riddles from the db.
  */
 function riddler_get_riddles() {
-  $query = db_select('riddler_questions', 'r');
-  $query->fields('r', array('question', 'answer'));
-  $result = $query->execute();
-  while ($riddle = $result->fetchAssoc()) {
-    $riddles[] = $riddle;
-  }
+  $riddles = config_get('riddler.settings', 'riddler_questions');
   return !empty($riddles) ? $riddles : array();
 }
