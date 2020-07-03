@@ -3,10 +3,6 @@
 /**
  * @file
  * Adds a question and answer type to the Captcha module.
- *
- * When enabled this module will add a required field to forms of your choice
- * asking a simple question to avoid automatic content creation by
- * spambots. The question and answers are custimizable.
  */
 
 /**
@@ -21,9 +17,8 @@ function riddler_config_info() {
 }
 
 /**
- * Implementation of hook_permission().
+ * Implements hook_permission().
  */
-
 function riddler_permission() {
   return array(
     'administer riddler' => array(
@@ -34,9 +29,8 @@ function riddler_permission() {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
-
 function riddler_menu() {
   $items = array();
   $items['admin/config/people/captcha/riddler'] = array(
@@ -60,7 +54,7 @@ function riddler_settings($form, &$form_state) {
   $saved_riddles = count($riddles);
   $form = array();
   $form['riddler_weight'] = array(
-    '#type' => 'number',// FIXME number field.
+    '#type' => 'number',
     '#title' => t('Weight'),
     '#default_value' => config_get('riddler.settings', 'riddler_weight'),
     '#min' => -20,
@@ -162,7 +156,6 @@ function riddler_ajax_add_riddle($form, $form_state) {
   return $form['riddler_groups'];
 }
 
-
 /**
  * Validate the settings form.
  */
@@ -198,10 +191,9 @@ function riddler_settings_submit($form, &$form_state) {
           'question' => $values['riddler_question_' . $qid],
           'answer' => $values['riddler_answer_' . $qid],
         );
-        // Force call to t() to insert new riddles in the translation database!
-        // FIXME translatable.
-        //$translation_hack = t(filter_xss($values['riddler_question_' . $qid]));
-        //$translation_hack = t(filter_xss($values['riddler_answer_' . $qid]));
+        // @todo translatable.
+        // $translation_hack = t(filter_xss($values['riddler_question_' . $qid]));
+        // $translation_hack = t(filter_xss($values['riddler_answer_' . $qid]));
       }
     }
   }
@@ -213,44 +205,46 @@ function riddler_settings_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of hook_captcha().
+ * Implements hook_captcha().
  */
 function riddler_captcha($op, $captcha_type = '') {
   switch ($op) {
-    case 'list' :
+    case 'list':
       return array('Riddler');
-      break;
-    case 'generate' :
+
+    case 'generate':
       if ($captcha_type == 'Riddler') {
+        // @todo translatable question / answer.
         $result = array();
         $riddles = riddler_get_riddles();
         $key = array_rand($riddles);
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
-          '#title' => t(filter_xss($riddles[$key]['question'])),
+          '#title' => filter_xss($riddles[$key]['question']),
           '#description' => t('Fill in the blank.'),
           '#size' => 50,
           '#maxlength' => 50,
           '#required' => TRUE,
           '#weight' => config_get('riddler.settings', 'riddler_weight'),
         );
-        $result['solution'] = t(filter_xss((string) (backdrop_strtolower($riddles[$key]['answer']))));
+        $result['solution'] = filter_xss((string) (backdrop_strtolower($riddles[$key]['answer'])));
         $result['captcha_validate'] = 'riddler_captcha_validate';
         return $result;
       }
       break;
+
   }
 }
 
 /**
  * Custom captcha validation.
  *
- * @param $solution
+ * @param string $solution
  *   Comma-separated string of acceptable answers.
- * @param $response
+ * @param string $response
  *   User enter answer to match agains solution.
  *
- * @return
+ * @return bool
  *   TRUE if the response is found in the solution, or FALSE.
  */
 function riddler_captcha_validate($solution, $response) {
@@ -260,7 +254,7 @@ function riddler_captcha_validate($solution, $response) {
 }
 
 /**
- * Load riddles from the db.
+ * Load riddles from config.
  */
 function riddler_get_riddles() {
   $riddles = config_get('riddler.settings', 'riddler_questions');
