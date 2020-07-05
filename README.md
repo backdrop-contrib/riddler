@@ -1,18 +1,18 @@
 # Captcha Riddler
 
-Simple but effective spam protection.
+Simple but effective form spam protection.
 
 This module lets you create custom riddles for the Captcha module,
 requiring guests to answer the 'riddle' before being allowed to submit the form.
 
 - Create your own Captcha questions to give your forms personality that matches your site
-- Allows multiple possible answers for one question.
-- Multiple possible questions, randomly presenting just one to the user.
+- Allows multiple possible answers for one question
+- Available questions get randomly presented to people
 
 ## Examples
 
-Depending on your situation, you might ask different questions to get the
-most out of Captcha Riddler without frustating your site visitors.
+Depending on your situation, you might ask different types of questions to get
+the most out of Captcha Riddler without frustating site visitors.
 
 If people who register or fill out any forms should know certain things anyway, ask
 these commonly known things, e.g.:
