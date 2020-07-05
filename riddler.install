@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Captcha Riddler module.
+ */
+
+/**
+ * @addtogroup updates-7.x-to-1.x
+ * @{
+ */
+
+/**
+ * Implements hook_update_N().
+ */
+function riddler_update_1000() {
+  if (db_table_exists('riddler_questions')) {
+    $riddles = array();
+    $translatables = array();
+    $query = db_select('riddler_questions', 'r');
+    $query->fields('r', array('question', 'answer'));
+    $result = $query->execute();
+    while ($riddle = $result->fetchAssoc()) {
+      $uuid = new Uuid();
+      $key = $uuid->generate();
+      $riddles[$key] = $riddle;
+      $translatables[] = "riddler_questions.{$key}.question";
+      $translatables[] = "riddler_questions.{$key}.answer";
+    }
+    $config = config('riddler.settings');
+    $config->set('_config_translatables', $translatables);
+    $config->set('riddler_weight', update_variable_get('riddler_weight', 0));
+    $config->set('riddler_questions', $riddles);
+    $config->save();
+
+    update_variable_del('riddler_weight');
+    db_drop_table('riddler_questions');
+  }
+}
+
+/**
+ * @} End of "addtogroup updates-7.x-to-1.x"
+ * The next series of updates should start at 2000.
+ */
