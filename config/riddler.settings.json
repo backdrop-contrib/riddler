@@ -1,10 +1,14 @@
 {
     "_config_name": "riddler.settings",
     "riddler_weight": "0",
-    "riddler_questions": [
-        {
+    "riddler_questions": {
+        "0279c154-4431-408d-ad00-c7750be2b3ce": {
             "question": "Do you like SPAM?",
-            "answer": "No!"
+            "answer": "No"
         }
+    },
+    "_config_translatables": [
+        "0279c154-4431-408d-ad00-c7750be2b3ce_question",
+        "0279c154-4431-408d-ad00-c7750be2b3ce_answer"
     ]
 }
