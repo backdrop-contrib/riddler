@@ -169,17 +169,17 @@ function riddler_ajax_add_riddle(&$form, &$form_state) {
  * Validate the settings form.
  */
 function riddler_settings_validate($form, &$form_state) {
-  $i = 1;
+  $i = 0;
   unset($form_state['values']['riddler_groups']['riddler_add']);
   $riddler_groups = $form_state['values']['riddler_groups'];
   foreach ($riddler_groups as $uuid => $values) {
     $i++;
     if ($values['riddler_question'] != '' && $values['riddler_answer'] == '') {
-      $element = "riddler_groups[{$uuid}][riddler_answer]";
+      $element = "riddler_groups][{$uuid}][riddler_answer";
       form_set_error($element, t('Riddle !i is incomplete (answer is missing).', array('!i' => $i)));
     }
     if ($values['riddler_question'] == '' && $values['riddler_answer'] != '') {
-      $element = "riddler_groups[{$uuid}][riddler_question]";
+      $element = "riddler_groups][{$uuid}][riddler_question";
       form_set_error($element, t('Riddle !i is incomplete (question is missing).', array('!i' => $i)));
     }
     // Unset any completely empty riddle/answer pairs.
