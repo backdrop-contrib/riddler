@@ -203,11 +203,9 @@ function riddler_settings_submit($form, &$form_state) {
         'question' => $values['riddler_question'],
         'answer' => $values['riddler_answer'],
       );
-      $translatables[] = $uuid . '_question';
-      $translatables[] = $uuid . '_answer';
-      // @todo translatable.
-      // $translation_hack = t(filter_xss($values['riddler_question_' . $qid]));
-      // $translation_hack = t(filter_xss($values['riddler_answer_' . $qid]));
+      $translatables[] = "riddler_questions.{$uuid}.question";
+      $translatables[] = "riddler_questions.{$uuid}.answer";
+      // @todo We might need to trigger locale to pick these up?
     }
   }
   $config = config('riddler.settings');
@@ -232,16 +230,18 @@ function riddler_captcha($op, $captcha_type = '') {
         $result = array();
         $riddles = riddler_get_riddles();
         $key = array_rand($riddles);
+        $question = config_get_translated('riddler.settings', "riddler_questions.{$key}.question");
+        $solution = config_get_translated('riddler.settings', "riddler_questions.{$key}.answer");
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
-          '#title' => filter_xss($riddles[$key]['question']),
+          '#title' => filter_xss($question),
           '#description' => t('Fill in the blank.'),
           '#size' => 50,
           '#maxlength' => 50,
           '#required' => TRUE,
           '#weight' => config_get('riddler.settings', 'riddler_weight'),
         );
-        $result['solution'] = filter_xss((string) (backdrop_strtolower($riddles[$key]['answer'])));
+        $result['solution'] = filter_xss((string) (backdrop_strtolower($solution)));
         $result['captcha_validate'] = 'riddler_captcha_validate';
         return $result;
       }
