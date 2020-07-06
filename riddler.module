@@ -205,7 +205,12 @@ function riddler_settings_submit($form, &$form_state) {
       );
       $translatables[] = "riddler_questions.{$uuid}.question";
       $translatables[] = "riddler_questions.{$uuid}.answer";
-      // @todo We might need to trigger locale to pick these up?
+      if (module_exists('locale')) {
+        // Trigger locale to put new strings into translation database.
+        $base_context = "config:riddler.settings:riddler_questions.{$uuid}";
+        locale(filter_xss($values['riddler_question']), $base_context . '.question');
+        locale(filter_xss($values['riddler_answer']), $base_context . '.answer');
+      }
     }
   }
   $config = config('riddler.settings');
