@@ -1,6 +1,7 @@
 name = Captcha Riddler
 description = Allows site administrators to add a simple question to form validation.
 backdrop = 1.x
+type = module
 tags[] = "Spam control"
 dependencies[] = captcha
 configure = admin/config/people/captcha/riddler
