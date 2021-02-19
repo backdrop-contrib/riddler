@@ -41,6 +41,15 @@ function riddler_menu() {
     'access arguments' => array('administer riddler'),
     'type' => MENU_LOCAL_TASK,
   );
+  // This only makes sense with Locale module enabled.
+  if (module_exists('locale')) {
+    $items['admin/config/people/captcha/riddler/translate'] = array(
+      'title' => 'Riddler translation',
+      'page callback' => 'riddler_translations_page',
+      'access arguments' => array('administer riddler'),
+      'type' => MENU_LOCAL_TASK,
+    );
+  }
   return $items;
 }
 
@@ -57,16 +66,18 @@ function riddler_settings($form, &$form_state) {
     $riddles = riddler_get_riddles();
   }
   $form = array();
+  $header = riddler_page_header();
+  if (!empty($header)) {
+    $form['header'] = array(
+      '#type' => 'markup',
+      '#markup' => $header,
+    );
+    $form['help'] = array(
+      '#type' => 'help',
+      '#markup' => 'If you plan to translate these riddles, they should be in English.',
+    );
+  }
   $form['#tree'] = TRUE;
-  $form['riddler_weight'] = array(
-    '#type' => 'number',
-    '#title' => t('Weight'),
-    '#default_value' => config_get('riddler.settings', 'riddler_weight'),
-    '#min' => -20,
-    '#max' => 20,
-    '#description' => t('Weight of the Riddler form element'),
-    '#required' => TRUE,
-  );
   $form['riddler_groups'] = array(
     '#type' => 'fieldset',
     '#title' => t('Riddles'),
@@ -147,6 +158,15 @@ function riddler_settings($form, &$form_state) {
       'effect' => 'fade',
     ),
   );
+  $form['riddler_weight'] = array(
+    '#type' => 'number',
+    '#title' => t('Weight'),
+    '#default_value' => config_get('riddler.settings', 'riddler_weight'),
+    '#min' => -20,
+    '#max' => 20,
+    '#description' => t('Weight of the Riddler form element'),
+    '#required' => TRUE,
+  );
   // Use tempstore to park already added values.
   $form_state['storage']['riddles'] = $riddles;
   $form['#validate'][] = 'riddler_settings_validate';
@@ -219,6 +239,122 @@ function riddler_settings_submit($form, &$form_state) {
   $config->set('riddler_questions', $riddler_questions);
   $config->save();
   backdrop_set_message(t('Riddler settings saved.'), 'status');
+}
+
+/**
+ * Helper function to output a page header with fake secondary tabs.
+ */
+function riddler_page_header() {
+  $markup = '';
+  // The secondary tabs only make sense, when translation is needed. Module
+  // locale or language are unreliable indicators, as they're also enabled on
+  // single language sites that aren't English.
+  if (module_exists('translation')) {
+    $variables = array();
+    $variables['attributes']['class'] = array('tabs', 'secondary');
+    $variables['links'][] = array(
+      'title' => 'Riddles',
+      'href' => 'admin/config/people/captcha/riddler',
+    );
+    $variables['links'][] = array(
+      'title' => 'Riddle translations',
+      'href' => 'admin/config/people/captcha/riddler/translate',
+    );
+    $markup = theme('links', $variables);
+  }
+  return $markup;
+}
+
+/**
+ * Page callback for riddle translation overview.
+ *
+ * Provides an overview similar to the locale page, but only shows entries of
+ * translatable config items for this module.
+ */
+function riddler_translations_page() {
+  $output = riddler_page_header();
+  $config = config('riddler.settings');
+  $riddles = $config->get('riddler_questions');
+
+  if (!empty($riddles)) {
+    $translatables = $config->get('_config_translatables');
+    // Create array of contexts to search for in locale db.
+    $contexts = array();
+    foreach ($translatables as $translatable) {
+      $prefix = 'config:riddler.settings:';
+      $contexts[] = $prefix . $translatable;
+    }
+
+    $sql_query = db_select('locales_source', 's');
+    $sql_query->leftJoin('locales_target', 't', 't.lid = s.lid');
+    $sql_query->fields('s', array('source', 'context', 'lid'));
+    $sql_query->fields('t', array('translation', 'language'));
+    $sql_query->condition('s.context', $contexts, 'IN');
+
+    $sql_query = $sql_query->extend('PagerDefault')->limit(20);
+    $locales = $sql_query->execute()->fetchAll();
+
+    $strings = array();
+    foreach ($locales as $data) {
+      $lid = $data->lid;
+      if (!isset($strings[$lid])) {
+        $strings[$lid] = array(
+          'source' => $data->source,
+          'context' => $data->context,
+          'languages' => array(),
+        );
+      }
+      if (isset($data->language)) {
+        $strings[$lid]['languages'][$data->language] = $data->language;
+      }
+    }
+
+    $header = array('String', 'Context', 'Languages', 'Operations');
+    $rows = array();
+    $languages = language_list();
+    unset($languages['en']);
+    foreach ($strings as $lid => $data) {
+      // Create list of translated / untranslated by langcode.
+      $language_codes = array();
+      foreach ($languages as $langcode => $language) {
+        if (isset($data['languages'][$langcode])) {
+          $language_codes[] = $langcode;
+        }
+        else {
+          $language_codes[] = '<strike>' . $langcode . '</strike>';
+        }
+      }
+      $langcodes = implode(' ', $language_codes);
+
+      // Create action links to original locale forms.
+      $links = array();
+      $links['edit'] = array(
+        'title' => t('Edit'),
+        'href' => "admin/config/regional/translate/edit/$lid",
+        'query' => backdrop_get_destination(),
+        'class' => array('nowrap'),
+      );
+      $links['delete'] = array(
+        'title' => t('Delete'),
+        'href' => "admin/config/regional/translate/delete/$lid",
+        'query' => backdrop_get_destination(),
+        'class' => array('nowrap'),
+      );
+
+      // Add table rows.
+      $rows[$lid] = array(
+        array('data' => check_plain(truncate_utf8($data['source'], 150, FALSE, TRUE))),
+        array('data' => $data['context']),
+        array('data' => $langcodes),
+        array('data' => array('#type' => 'operations', '#links' => $links)),
+      );
+    }
+
+  }
+
+  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'empty' => t('No strings available.')));
+  $output .= theme('pager');
+  return $output;
 }
 
 /**
