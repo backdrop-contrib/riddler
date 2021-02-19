@@ -277,11 +277,11 @@ function riddler_page_header() {
     $variables = array();
     $variables['attributes']['class'] = array('tabs', 'secondary');
     $variables['links'][] = array(
-      'title' => 'Riddles',
+      'title' => t('Riddles'),
       'href' => 'admin/config/people/captcha/riddler',
     );
     $variables['links'][] = array(
-      'title' => 'Riddle translations',
+      'title' => t('Riddle translations'),
       'href' => 'admin/config/people/captcha/riddler/translate',
     );
     $markup = theme('links', $variables);
