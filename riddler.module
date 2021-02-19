@@ -335,7 +335,7 @@ function riddler_translations_page() {
       }
     }
 
-    $header = array('String', 'Context', 'Languages', 'Operations');
+    $header = array(t('String'), t('Context'), t('Languages'), t('Operations'));
     $rows = array();
     $languages = language_list();
     unset($languages['en']);
