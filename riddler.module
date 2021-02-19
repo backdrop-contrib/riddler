@@ -262,6 +262,8 @@ function riddler_settings_submit($form, &$form_state) {
   $config->set('description', $form_state['values']['description']);
   $config->set('riddler_questions', $riddler_questions);
   $config->save();
+
+  _riddler_cleanup_obsolete_locale_strings($translatables);
   backdrop_set_message(t('Riddler settings saved.'), 'status');
 }
 
@@ -442,4 +444,41 @@ function riddler_captcha_validate($solution, $response) {
 function riddler_get_riddles() {
   $riddles = config_get('riddler.settings', 'riddler_questions');
   return !empty($riddles) ? $riddles : array();
+}
+
+/**
+ * Helper function to cleanup outdated strings from locale tables.
+ *
+ * @param array $existing_translatables
+ *   List of existing translatables, that are still in use and should be kept.
+ */
+function _riddler_cleanup_obsolete_locale_strings($existing_translatables) {
+  if (empty($existing_translatables)) {
+    return;
+  }
+
+  $prefix = 'config:riddler.settings:';
+  $contexts = array();
+  foreach ($existing_translatables as $translatable) {
+    $contexts[] = $prefix . $translatable;
+  }
+  // Get all entries with our prefix that are not in use anymore.
+  $sql_query = db_select('locales_source', 's')
+    ->fields('s', array('lid'))
+    ->condition('s.context', $prefix . '%', 'LIKE')
+    ->condition('s.context', $contexts, 'NOT IN');
+
+  $result = $sql_query->execute()->fetchAllAssoc('lid');
+  if (empty($result)) {
+    return;
+  }
+
+  $obsolete_lids = array_keys($result);
+  db_delete('locales_source')
+    ->condition('lid', $obsolete_lids, 'IN')
+    ->execute();
+
+  db_delete('locales_target')
+    ->condition('lid', $obsolete_lids, 'IN')
+    ->execute();
 }
