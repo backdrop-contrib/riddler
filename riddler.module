@@ -368,8 +368,9 @@ function riddler_translations_page() {
       );
 
       // Add table rows.
+      $short_string = truncate_utf8($data['source'], 150, FALSE, TRUE);
       $rows[$lid] = array(
-        array('data' => check_plain(truncate_utf8($data['source'], 150, FALSE, TRUE))),
+        array('data' => check_plain($short_string)),
         array('data' => $data['context']),
         array('data' => $langcodes),
         array('data' => array('#type' => 'operations', '#links' => $links)),
@@ -378,7 +379,11 @@ function riddler_translations_page() {
 
   }
 
-  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'empty' => t('No strings available.')));
+  $output .= theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'empty' => t('No strings available.'),
+  ));
   $output .= theme('pager');
   return $output;
 }
