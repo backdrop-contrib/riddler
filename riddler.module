@@ -158,10 +158,26 @@ function riddler_settings($form, &$form_state) {
       'effect' => 'fade',
     ),
   );
+  $config = config('riddler.settings');
+  $form['use_description'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show a short description beneath the riddles'),
+    '#default_value' => $config->get('use_description'),
+  );
+  $form['description'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Riddler help text'),
+    '#default_value' => $config->get('description'),
+    '#states' => array(
+      'invisible' => array(
+        ':input[name="use_description"]' => array('checked' => FALSE),
+      ),
+    ),
+  );
   $form['riddler_weight'] = array(
     '#type' => 'number',
     '#title' => t('Weight'),
-    '#default_value' => config_get('riddler.settings', 'riddler_weight'),
+    '#default_value' => $config->get('riddler_weight'),
     '#min' => -20,
     '#max' => 20,
     '#description' => t('Weight of the Riddler form element'),
@@ -233,9 +249,17 @@ function riddler_settings_submit($form, &$form_state) {
       }
     }
   }
+  if (!empty($form_state['values']['description'])) {
+    $translatables[] = 'description';
+    if (module_exists('locale')) {
+      locale(check_plain($form_state['values']['description']), 'config:riddler.settings:description');
+    }
+  }
   $config = config('riddler.settings');
   $config->set('_config_translatables', $translatables);
   $config->set('riddler_weight', $form_state['values']['riddler_weight']);
+  $config->set('use_description', $form_state['values']['use_description']);
+  $config->set('description', $form_state['values']['description']);
   $config->set('riddler_questions', $riddler_questions);
   $config->save();
   backdrop_set_message(t('Riddler settings saved.'), 'status');
@@ -373,15 +397,19 @@ function riddler_captcha($op, $captcha_type = '') {
         $key = array_rand($riddles);
         $question = config_get_translated('riddler.settings', "riddler_questions.{$key}.question");
         $solution = config_get_translated('riddler.settings', "riddler_questions.{$key}.answer");
+        $config = config('riddler.settings');
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
           '#title' => filter_xss($question),
-          '#description' => t('Fill in the blank.'),
           '#size' => 50,
           '#maxlength' => 50,
           '#required' => TRUE,
-          '#weight' => config_get('riddler.settings', 'riddler_weight'),
+          '#weight' => $config->get('riddler_weight'),
         );
+        if ($config->get('use_description')) {
+          $description = config_get_translated('riddler.settings', 'description');
+          $result['form']['captcha_response']['#description'] = check_plain($description);
+        }
         $result['solution'] = filter_xss((string) (backdrop_strtolower($solution)));
         $result['captcha_validate'] = 'riddler_captcha_validate';
         return $result;

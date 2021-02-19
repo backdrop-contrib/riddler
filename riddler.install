@@ -39,6 +39,19 @@ function riddler_update_1000() {
 }
 
 /**
+ * Add new riddler settings to config.
+ */
+function riddler_update_1001() {
+  $config = config('riddler.settings');
+  $translatables = $config->get('_config_translatables');
+  $translatables[] = 'description';
+  $config->set('_config_translatables', $translatables);
+  $config->set('use_description', TRUE);
+  $config->set('description', 'Fill in the blank.');
+  $config->save();
+}
+
+/**
  * @} End of "addtogroup updates-7.x-to-1.x"
  * The next series of updates should start at 2000.
  */

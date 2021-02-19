@@ -7,8 +7,11 @@
             "answer": "No"
         }
     },
+    "use_description": true,
+    "description": "Fill in the blank.",
     "_config_translatables": [
         "riddler_questions.0279c154-4431-408d-ad00-c7750be2b3ce.question",
-        "riddler_questions.0279c154-4431-408d-ad00-c7750be2b3ce.answer"
+        "riddler_questions.0279c154-4431-408d-ad00-c7750be2b3ce.answer",
+        "description"
     ]
 }
