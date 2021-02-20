@@ -354,7 +354,7 @@ function riddler_translations_page() {
           $language_codes[] = $langcode;
         }
         else {
-          $language_codes[] = '<strike>' . $langcode . '</strike>';
+          $language_codes[] = '<s>' . $langcode . '</s>';
         }
       }
       $langcodes = implode(' ', $language_codes);
