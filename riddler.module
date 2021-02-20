@@ -74,7 +74,7 @@ function riddler_settings($form, &$form_state) {
     );
     $form['help'] = array(
       '#type' => 'help',
-      '#markup' => 'If you plan to translate these riddles, they should be in English.',
+      '#markup' => t('If you plan to translate these riddles, they should be in English.'),
     );
   }
   $form['#tree'] = TRUE;
