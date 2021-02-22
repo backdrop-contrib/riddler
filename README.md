@@ -8,6 +8,8 @@ requiring guests to answer the 'riddle' before being allowed to submit the form.
 - Create your own Captcha questions to give your forms personality that matches your site
 - Allows multiple possible answers for one question
 - Available questions get randomly presented to people
+- On multilingual sites riddles are translatable (source language is English)
+- Text Captchas are better than image Captchas regarding web accessibility
 
 ## Examples
 
