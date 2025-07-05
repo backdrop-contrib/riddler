@@ -439,7 +439,7 @@ function riddler_captcha($op, $captcha_type = '') {
  * @param string $solution
  *   Comma-separated string of acceptable answers.
  * @param string $response
- *   User enter answer to match agains solution.
+ *   User enter answer to match against solution.
  *
  * @return bool
  *   TRUE if the response is found in the solution, or FALSE.
@@ -447,6 +447,7 @@ function riddler_captcha($op, $captcha_type = '') {
 function riddler_captcha_validate($solution, $response) {
   $solution = str_ireplace(',', ' ', $solution);
   $solution = explode(' ', $solution);
+  $solution = array_filter($solution);
   return in_array(backdrop_strtolower($response), $solution);
 }
 
